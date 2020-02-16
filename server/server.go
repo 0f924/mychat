@@ -3,34 +3,40 @@ package main
 import (
 	"fmt"
 	"log"
+	"mychat/protocol/channel"
 	"net"
 	"time"
 )
 
-func main() {
-	// 1. 接收从客户端获取的数据，并打印“当前时间：服务端读到数据 -> 数据”
-	listenner, err := net.Listen("tcp", "127.0.0.1:8081")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	defer listenner.Close()
-	conn, err := listenner.Accept()
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	defer conn.Close()
-	buf := make([]byte, 1024)
-	n, err := conn.Read(buf)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	result := buf[:n]
-	fmt.Println(time.Now().String() + ": 服务端读到数据 -> " + string(result))
+const (
+	PORT string = "8081"
+)
 
-	// 2. 打印“当前时间：服务端写出数据”，并发送“你好，欢迎关注我的微信公众号，《闪电侠的博客》！”
-	fmt.Println(time.Now().String() + ": 服务端写出数据")
-	conn.Write([]byte("你好，欢迎关注我的微信公众号，《闪电侠的博客》！"))
+func main() {
+	// 1. 监听端口
+	listener := bind(PORT)
+
+	// 2. 处理请求
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Fatal("与客户端的连接建立失败！")
+		}
+		handler := channel.ServerHandler{Conn: conn}
+		data := make([]byte, 1024)
+		n, err := conn.Read(data)
+		if err != nil {
+			log.Fatal("服务端读取数据失败！")
+		}
+		go handler.ChannelRead(data[:n])
+	}
+}
+
+func bind(port string) net.Listener {
+	listener, err := net.Listen("tcp", "127.0.0.1:"+port)
+	if err != nil {
+		log.Fatal("端口[" + string(port) + "]绑定失败！")
+	}
+	fmt.Println(time.Now().String() + ": 端口[" + string(port) + "]绑定成功！")
+	return listener
 }

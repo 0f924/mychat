@@ -3,28 +3,45 @@ package main
 import (
 	"fmt"
 	"log"
+	"mychat/protocol/channel"
 	"net"
+	"strconv"
 	"time"
 )
 
-func main() {
-	// 1. 打印“当前时间：客户端写出数据”，并发送“你好，闪电侠！”到服务端
-	fmt.Println(time.Now().String() + ": 客户端写出数据")
-	conn, err := net.Dial("tcp", "127.0.0.1:8081")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	defer conn.Close()
-	conn.Write([]byte("你好，闪电侠！"))
+const (
+	MAX_RETRY int    = 5
+	HOST      string = "127.0.0.1"
+	PORT      string = "8081"
+)
 
-	// 2. 读取服务端数据，并打印“当前时间：客户端读到数据 -> 数据”
-	buf := make([]byte, 1024)
-	n, err := conn.Read(buf)
+func main() {
+
+	conn := connect(HOST, PORT, MAX_RETRY)
+
+	handler := channel.ClientHandler{Conn: conn}
+	handler.ChannelActive()
+	data := make([]byte, 1024)
+	n, err := conn.Read(data)
 	if err != nil {
-		log.Fatal(err)
-		return
+		log.Fatal("客户端读取数据失败！")
 	}
-	result := buf[:n]
-	fmt.Printf(time.Now().String() + ": 客户端读到数据 -> " + string(result))
+	handler.ChannelRead(data[:n])
+}
+
+func connect(host, port string, retry int) net.Conn {
+	conn, err := net.Dial("tcp", host+":"+port)
+	if err != nil {
+		if retry == 0 {
+			panic("重试次数已用完，放弃连接！")
+		} else {
+			order := (MAX_RETRY - retry) + 1
+			delay := order * 2
+			fmt.Println(time.Now().String() + ": 连接失败，第" + strconv.Itoa(order) + "次重连......")
+			time.Sleep(time.Second * time.Duration(delay))
+			connect(host, port, retry-1)
+		}
+	}
+	fmt.Println(time.Now().String() + ": 连接成功！")
+	return conn
 }
