@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"mychat/protocol/channel"
+	"mychat/protocol/packet"
+	"mychat/utils"
 	"net"
 	"strconv"
 	"time"
@@ -17,16 +18,12 @@ const (
 
 func main() {
 
+	// 建立 tcp 连接
 	conn := connect(HOST, PORT, MAX_RETRY)
-
-	handler := channel.ClientHandler{Conn: conn}
-	handler.ChannelActive()
-	data := make([]byte, 1024)
-	n, err := conn.Read(data)
-	if err != nil {
-		log.Fatal("客户端读取数据失败！")
-	}
-	handler.ChannelRead(data[:n])
+	// 发送 登录请求
+	sendLoginReq(conn)
+	// 接收 登录响应
+	receiveLoginResp(conn)
 }
 
 func connect(host, port string, retry int) net.Conn {
@@ -44,4 +41,32 @@ func connect(host, port string, retry int) net.Conn {
 	}
 	fmt.Println(time.Now().String() + ": 连接成功！")
 	return conn
+}
+
+// 发送 登录请求包
+func sendLoginReq(conn net.Conn) {
+	fmt.Println(time.Now().String() + ": 客户端开始登录")
+	req := packet.LoginRequestPacket{
+		UserId:   utils.GetRandomId(),
+		UserName: "flash",
+		Password: "pwd",
+	}
+
+	conn.Write(packet.Encode(req))
+}
+
+// 接收 登录响应包
+func receiveLoginResp(conn net.Conn) {
+	data := make([]byte, 1024)
+	n, err := conn.Read(data)
+	if err != nil {
+		log.Fatal("读取登录响应包失败！")
+	}
+	data = data[:n]
+	resp := packet.Decode(data).(packet.LoginResponsePacket)
+	if resp.IsSuccess {
+		fmt.Println(time.Now().String() + ": 客户端登录成功")
+	} else {
+		fmt.Println(time.Now().String() + ": 客户端登录失败，原因：" + resp.Reason)
+	}
 }
