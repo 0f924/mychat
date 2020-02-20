@@ -4,7 +4,6 @@ import (
 	"mychat/mychannel"
 	"mychat/protocol/packet"
 	"mychat/session"
-	"mychat/utils"
 )
 
 type LoginRequestHandler struct {
@@ -20,7 +19,9 @@ func (this LoginRequestHandler) Exec(mychan *mychannel.MyChannel, data packet.Pa
 	}
 	mychan.SetAttr("user", user)
 
-	utils.Info("用户已登录")
+	// 待重构功能点
+	// session.UserIdChannelMap[user.UserId] = mychan
+	// session.NameToIdMap[user.UserName] = user.UserId
 
 	// 回送：登录响应包
 	loginResp := packet.LoginResponsePacket{

@@ -5,6 +5,7 @@ import (
 	"mychat/mychannel"
 	"mychat/protocol/packet"
 	"mychat/utils"
+	"time"
 )
 
 type LoginConsoleCommand struct {
@@ -20,5 +21,12 @@ func (this LoginConsoleCommand) Exec(mychan *mychannel.MyChannel) {
 	loginReq.UserName = username
 	loginReq.Password = "pwd"
 
+	fmt.Println(username + ": " + loginReq.UserId)
 	mychan.Write(loginReq)
+
+	waitForLogin()
+}
+
+func waitForLogin() {
+	time.Sleep(3 * time.Second)
 }

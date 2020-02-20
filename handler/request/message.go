@@ -19,7 +19,13 @@ func (this MessageRequestHandler) Exec(mychan *mychannel.MyChannel, data packet.
 		FromUserName: user.UserName,
 		Message:      msgReq.Message,
 	}
-	// 发送响应包给指定用户（待实现）
-	fmt.Println("将要发送响应包:", msgResp)
-	mychan.Write(msgResp)
+
+	// 多余代码
+	fmt.Println(msgResp)
+
+	// 发送响应包给目标用户
+
+	// 待重构功能点
+	// toChan := handler.UserIdChannelMap[msgReq.ToUserId]
+	// toChan.Write(msgResp)
 }

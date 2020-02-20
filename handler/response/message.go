@@ -11,5 +11,6 @@ type MessageResponseHandler struct {
 
 func (this MessageResponseHandler) Exec(mychan *mychannel.MyChannel, data packet.Packet) {
 	msgResp := data.(packet.MessageResponsePacket)
-	fmt.Println("接收到单发信息响应包：", msgResp)
+	fromUserId, fromUserName := msgResp.FromUserName, msgResp.FromUserName
+	fmt.Println(fromUserId + ":" + fromUserName + " -> " + msgResp.Message)
 }

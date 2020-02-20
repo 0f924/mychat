@@ -49,25 +49,27 @@ func connect(host, port string, retry int) net.Conn {
 
 // 客户端工作流水线
 func pipeline(mychan *mychannel.MyChannel) {
-	defer mychan.Close()
-	startConsole(mychan)
 	go startHandlePacket(mychan)
+	startConsole(mychan)
 }
 
 // 开启用户命令行终端
 func startConsole(mychan *mychannel.MyChannel) {
-	command_manager := console.CommandManager{}
+	loginCmd := console.LoginConsoleCommand{}
+	loginedCmd := console.CommandManager{}
 	for {
-		fmt.Printf("============命令列表============\n")
-		fmt.Printf("登录 -- login\n")
-		fmt.Printf("发送信息给用户 -- sendToUser\n")
-		fmt.Printf("===============================\n")
-		fmt.Printf("请输入指令: ")
-		command_manager.Exec(mychan)
+		if mychan.IsExists("login") {
+			loginedCmd.Exec(mychan)
+		} else {
+			loginCmd.Exec(mychan)
+		}
 	}
 }
 
 // 开启数据包监听处理服务
 func startHandlePacket(mychan *mychannel.MyChannel) {
-	handler.HandlerManager{}.Exec(mychan, nil)
+	defer mychan.Close()
+	for {
+		handler.HandlerManager{}.Exec(mychan, nil)
+	}
 }

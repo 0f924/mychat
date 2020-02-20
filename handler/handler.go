@@ -8,6 +8,14 @@ import (
 	"mychat/protocol/packet"
 )
 
+// 很有可能不做保留的代码
+/**
+var (
+	NameToIdMap map[string]string = make(map[string]string)
+	UserIdChannelMap map[string]*mychannel.MyChannel = make(map[string]*mychannel.MyChannel)
+)
+*/
+
 type Handler interface {
 	Exec(mychan *mychannel.MyChannel, data packet.Packet)
 }

@@ -15,12 +15,11 @@ type CommandManager struct {
 }
 
 func (this CommandManager) Exec(mychan *mychannel.MyChannel) {
+	fmt.Printf("请输入指令: ")
 	var command string
 	fmt.Scanln(&command)
 	command = strings.ToLower(command)
 	switch command {
-	case "login":
-		LoginConsoleCommand{}.Exec(mychan)
 	case "sendtouser":
 		SendToUserConsoleCommand{}.Exec(mychan)
 	case "sendtogroup":
