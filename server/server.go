@@ -18,6 +18,9 @@ func main() {
 	listener := bind(PORT)
 	defer listener.Close()
 
+	// 创建一个全局变量管理容器
+	ctx := handler.NewHandlerContext()
+
 	// 2. 处理请求
 	for {
 		// 接收来自客户端的连接
@@ -29,8 +32,9 @@ func main() {
 		// 装饰 服务端连接
 		mychan := mychannel.NewMyChannel(conn)
 
+		fmt.Println(ctx.UserChan)
 		// 给每一个客户端分配一个服务端工作流水线
-		go pipeline(mychan)
+		go pipeline(mychan, ctx)
 	}
 }
 
@@ -45,14 +49,14 @@ func bind(port string) net.Listener {
 }
 
 // 服务端分配给每个连接的工作流水线
-func pipeline(mychan *mychannel.MyChannel) {
-	startHandlePacket(mychan)
+func pipeline(mychan *mychannel.MyChannel, ctx *handler.HandlerContext) {
+	startHandlePacket(mychan, ctx)
 }
 
 // 开启数据包监听处理服务
-func startHandlePacket(mychan *mychannel.MyChannel) {
+func startHandlePacket(mychan *mychannel.MyChannel, ctx *handler.HandlerContext) {
 	defer mychan.Close()
 	for {
-		handler.HandlerManager{}.Exec(mychan, nil)
+		handler.HandlerManager{ctx}.Exec(mychan, nil)
 	}
 }

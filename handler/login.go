@@ -1,12 +1,15 @@
-package request
+package handler
 
 import (
+	"fmt"
 	"mychat/mychannel"
 	"mychat/protocol/packet"
 	"mychat/session"
 )
 
+// 请求包
 type LoginRequestHandler struct {
+	Ctx *HandlerContext
 }
 
 func (this LoginRequestHandler) Exec(mychan *mychannel.MyChannel, data packet.Packet) {
@@ -19,9 +22,10 @@ func (this LoginRequestHandler) Exec(mychan *mychannel.MyChannel, data packet.Pa
 	}
 	mychan.SetAttr("user", user)
 
-	// 待重构功能点
-	// session.UserIdChannelMap[user.UserId] = mychan
-	// session.NameToIdMap[user.UserName] = user.UserId
+	this.Ctx.UserChan[user.UserId] = mychan
+	for key, val := range this.Ctx.UserChan {
+		fmt.Println("login:", key, "---", val)
+	}
 
 	// 回送：登录响应包
 	loginResp := packet.LoginResponsePacket{
@@ -31,4 +35,17 @@ func (this LoginRequestHandler) Exec(mychan *mychannel.MyChannel, data packet.Pa
 		UserName:  user.UserName,
 	}
 	mychan.Write(loginResp)
+}
+
+// 响应包
+type LoginResponseHandler struct {
+}
+
+func (this LoginResponseHandler) Exec(mychan *mychannel.MyChannel, data packet.Packet) {
+	loginResp := data.(packet.LoginResponsePacket)
+
+	// 如果通过登录校验，记录登录状态
+	if loginResp.IsSuccess {
+		mychan.SetAttr("login", true)
+	}
 }

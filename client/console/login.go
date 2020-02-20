@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"mychat/mychannel"
 	"mychat/protocol/packet"
-	"mychat/utils"
 	"time"
 )
 
@@ -17,16 +16,14 @@ func (this LoginConsoleCommand) Exec(mychan *mychannel.MyChannel) {
 	fmt.Printf("输入用户名登录：")
 	var username string
 	fmt.Scanln(&username)
-	loginReq.UserId = "wx" + utils.GetRandomId()
+	// loginReq.UserId = "wx" + utils.GetRandomId()
+	loginReq.UserId = username
 	loginReq.UserName = username
 	loginReq.Password = "pwd"
-
-	fmt.Println(username + ": " + loginReq.UserId)
 	mychan.Write(loginReq)
-
 	waitForLogin()
 }
 
 func waitForLogin() {
-	time.Sleep(3 * time.Second)
+	time.Sleep(2 * time.Second)
 }
