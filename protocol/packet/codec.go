@@ -86,6 +86,22 @@ func Decode(bys []byte) Packet {
 			log.Fatal("JSON解码失败！")
 		}
 		packet = loginResp
+
+	case MESSAGE_REQUEST:
+		msgReq := MessageRequestPacket{}
+		err = json.Unmarshal(data, &msgReq)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = msgReq
+
+	case MESSAGE_RESPONSE:
+		msgResp := MessageResponsePacket{}
+		err = json.Unmarshal(data, &msgResp)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = msgResp
 	}
 
 	return packet

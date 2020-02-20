@@ -67,7 +67,7 @@ func (packet ListGroupMembersResponsePacket) GetType() byte {
 type LoginResponsePacket struct {
 	IsSuccess bool
 	Reason    string
-	UserId    uint64
+	UserId    string
 	UserName  string
 }
 

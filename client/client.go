@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"mychat/protocol/packet"
+	"mychat/client/console"
+	"mychat/handler"
+	"mychat/mychannel"
 	"mychat/utils"
 	"net"
 	"strconv"
@@ -20,12 +21,15 @@ func main() {
 
 	// 建立 tcp 连接
 	conn := connect(HOST, PORT, MAX_RETRY)
-	// 发送 登录请求
-	sendLoginReq(conn)
-	// 接收 登录响应
-	receiveLoginResp(conn)
+
+	// 装饰 客户端连接
+	mychan := mychannel.NewMyChannel(conn)
+
+	// 启动 客户端工作流水线
+	pipeline(mychan)
 }
 
+// 建立客户端连接，连接失败可重试
 func connect(host, port string, retry int) net.Conn {
 	conn, err := net.Dial("tcp", host+":"+port)
 	if err != nil {
@@ -39,34 +43,31 @@ func connect(host, port string, retry int) net.Conn {
 			connect(host, port, retry-1)
 		}
 	}
-	fmt.Println(time.Now().String() + ": 连接成功！")
+	utils.Info("客户端连接成功")
 	return conn
 }
 
-// 发送 登录请求包
-func sendLoginReq(conn net.Conn) {
-	fmt.Println(time.Now().String() + ": 客户端开始登录")
-	req := packet.LoginRequestPacket{
-		UserId:   utils.GetRandomId(),
-		UserName: "flash",
-		Password: "pwd",
-	}
-
-	conn.Write(packet.Encode(req))
+// 客户端工作流水线
+func pipeline(mychan *mychannel.MyChannel) {
+	defer mychan.Close()
+	startConsole(mychan)
+	go startHandlePacket(mychan)
 }
 
-// 接收 登录响应包
-func receiveLoginResp(conn net.Conn) {
-	data := make([]byte, 1024)
-	n, err := conn.Read(data)
-	if err != nil {
-		log.Fatal("读取登录响应包失败！")
+// 开启用户命令行终端
+func startConsole(mychan *mychannel.MyChannel) {
+	command_manager := console.CommandManager{}
+	for {
+		fmt.Printf("============命令列表============\n")
+		fmt.Printf("登录 -- login\n")
+		fmt.Printf("发送信息给用户 -- sendToUser\n")
+		fmt.Printf("===============================\n")
+		fmt.Printf("请输入指令: ")
+		command_manager.Exec(mychan)
 	}
-	data = data[:n]
-	resp := packet.Decode(data).(packet.LoginResponsePacket)
-	if resp.IsSuccess {
-		fmt.Println(time.Now().String() + ": 客户端登录成功")
-	} else {
-		fmt.Println(time.Now().String() + ": 客户端登录失败，原因：" + resp.Reason)
-	}
+}
+
+// 开启数据包监听处理服务
+func startHandlePacket(mychan *mychannel.MyChannel) {
+	handler.HandlerManager{}.Exec(mychan, nil)
 }

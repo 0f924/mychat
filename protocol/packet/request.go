@@ -59,7 +59,7 @@ func (packet ListGroupMembersRequestPacket) GetType() byte {
 
 // type: 登录验证包
 type LoginRequestPacket struct {
-	UserId   uint64
+	UserId   string
 	UserName string
 	Password string
 }
