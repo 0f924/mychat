@@ -20,8 +20,8 @@ func (packet CreateGroupResponsePacket) GetType() byte {
 // type: 发送群组信息（待实现）
 type GroupMessageResponsePacket struct {
 	FromGroupId string
-	// FromUser Session
-	Message string
+	FromUser    session.User
+	Message     string
 }
 
 func (packet GroupMessageResponsePacket) GetType() byte {

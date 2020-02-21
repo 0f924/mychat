@@ -41,6 +41,10 @@ func (this HandlerManager) Exec(mychan *mychannel.MyChannel, data packet.Packet)
 		ListGroupMembersRequestHandler{this.Ctx}.Exec(mychan, data)
 	case packet.LIST_GROUP_MEMBERS_RESPONSE:
 		ListGroupMembersResponseHandler{}.Exec(mychan, data)
+	case packet.GROUP_MESSAGE_REQUEST:
+		GroupMessageRequestHandler{this.Ctx}.Exec(mychan, data)
+	case packet.GROUP_MESSAGE_RESPONSE:
+		GroupMessageResponseHandler{}.Exec(mychan, data)
 	default:
 		fmt.Println("识别不出数据包的类型！")
 	}
