@@ -22,7 +22,7 @@ const (
 	JOIN_GROUP_REQUEST          byte = 11
 	JOIN_GROUP_RESPONSE         byte = 12
 	QUIT_GROUP_REQUEST          byte = 13
-	QUIT_GTOUP_RESPONSE         byte = 14
+	QUIT_GROUP_RESPONSE         byte = 14
 	GROUP_MESSAGE_REQUEST       byte = 15
 	GROUP_MESSAGE_RESPONSE      byte = 16
 	HEARTBEAT_REQUEST           byte = 17

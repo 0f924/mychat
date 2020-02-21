@@ -182,6 +182,22 @@ func Decode(bys []byte) Packet {
 			log.Fatal("JSON解码失败！")
 		}
 		packet = grpMsgResp
+
+	case QUIT_GROUP_REQUEST:
+		quitGrpReq := QuitGroupRequestPacket{}
+		err = json.Unmarshal(data, &quitGrpReq)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = quitGrpReq
+
+	case QUIT_GROUP_RESPONSE:
+		quitGrpResp := QuitGroupResponsePacket{}
+		err = json.Unmarshal(data, &quitGrpResp)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = quitGrpResp
 	}
 
 	return packet

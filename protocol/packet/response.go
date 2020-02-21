@@ -112,7 +112,7 @@ type QuitGroupResponsePacket struct {
 }
 
 func (packet QuitGroupResponsePacket) GetType() byte {
-	return QUIT_GTOUP_RESPONSE
+	return QUIT_GROUP_RESPONSE
 }
 
 // 退出群组 end

@@ -3,11 +3,19 @@ package console
 import (
 	"fmt"
 	"mychat/mychannel"
+	"mychat/protocol/packet"
 )
 
 type QuitGroupConsoleCommand struct {
 }
 
 func (this QuitGroupConsoleCommand) Exec(mychan *mychannel.MyChannel) {
-	fmt.Println("退出群组")
+	fmt.Printf("输入 groupId，退出群聊：")
+	var groupId string
+	fmt.Scanln(&groupId)
+
+	quitGrpReq := packet.QuitGroupRequestPacket{
+		GroupId: groupId,
+	}
+	mychan.Write(quitGrpReq)
 }
