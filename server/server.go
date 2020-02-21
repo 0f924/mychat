@@ -32,7 +32,6 @@ func main() {
 		// 装饰 服务端连接
 		mychan := mychannel.NewMyChannel(conn)
 
-		fmt.Println(ctx.UserChan)
 		// 给每一个客户端分配一个服务端工作流水线
 		go pipeline(mychan, ctx)
 	}

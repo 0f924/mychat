@@ -19,6 +19,10 @@ func NewMyChannel(conn net.Conn) *MyChannel {
 	return &mychan
 }
 
+func (this *MyChannel) DeleteAttr(key string) {
+	delete(this.attr, key)
+}
+
 func (this *MyChannel) SetAttr(key string, value interface{}) {
 	this.attr[key] = value
 }

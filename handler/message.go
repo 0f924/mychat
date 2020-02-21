@@ -5,6 +5,7 @@ import (
 	"mychat/mychannel"
 	"mychat/protocol/packet"
 	"mychat/session"
+	"mychat/utils"
 )
 
 // 请求包
@@ -27,6 +28,10 @@ func (this MessageRequestHandler) Exec(mychan *mychannel.MyChannel, data packet.
 	}
 
 	// 发送响应包给目标用户
+	if _, ok := this.Ctx.UserChan[msgReq.ToUserId]; !ok {
+		utils.Info("用户:" + msgReq.ToUserId + "不存在")
+		return
+	}
 	toChan := this.Ctx.UserChan[msgReq.ToUserId]
 	toChan.Write(msgResp)
 }
@@ -38,5 +43,5 @@ type MessageResponseHandler struct {
 func (this MessageResponseHandler) Exec(mychan *mychannel.MyChannel, data packet.Packet) {
 	msgResp := data.(packet.MessageResponsePacket)
 	fromUserId, fromUserName := msgResp.FromUserName, msgResp.FromUserName
-	fmt.Println(fromUserName + "(" + fromUserId + "): " + " -> " + msgResp.Message)
+	fmt.Println(fromUserName + "(" + fromUserId + "):" + msgResp.Message)
 }

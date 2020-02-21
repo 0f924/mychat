@@ -21,6 +21,10 @@ func (this HandlerManager) Exec(mychan *mychannel.MyChannel, data packet.Packet)
 		LoginRequestHandler{this.Ctx}.Exec(mychan, data)
 	case packet.LOGIN_RESPONSE:
 		LoginResponseHandler{}.Exec(mychan, data)
+	case packet.LOGOUT_REQUEST:
+		LogoutRequestHandler{this.Ctx}.Exec(mychan, data)
+	case packet.LOGOUT_RESPONSE:
+		LogoutResponseHandler{}.Exec(mychan, data)
 	case packet.MESSAGE_REQUEST:
 		MessageRequestHandler{this.Ctx}.Exec(mychan, data)
 	case packet.MESSAGE_RESPONSE:

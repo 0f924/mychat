@@ -87,6 +87,22 @@ func Decode(bys []byte) Packet {
 		}
 		packet = loginResp
 
+	case LOGOUT_REQUEST:
+		logoutReq := LogoutRequestPacket{}
+		err = json.Unmarshal(data, &logoutReq)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = logoutReq
+
+	case LOGOUT_RESPONSE:
+		logoutResp := LogoutResponsePacket{}
+		err = json.Unmarshal(data, &logoutResp)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = logoutResp
+
 	case MESSAGE_REQUEST:
 		msgReq := MessageRequestPacket{}
 		err = json.Unmarshal(data, &msgReq)

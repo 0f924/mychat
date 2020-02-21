@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"mychat/mychannel"
 	"mychat/protocol/packet"
 	"mychat/session"
@@ -23,9 +22,6 @@ func (this LoginRequestHandler) Exec(mychan *mychannel.MyChannel, data packet.Pa
 	mychan.SetAttr("user", user)
 
 	this.Ctx.UserChan[user.UserId] = mychan
-	for key, val := range this.Ctx.UserChan {
-		fmt.Println("login:", key, "---", val)
-	}
 
 	// 回送：登录响应包
 	loginResp := packet.LoginResponsePacket{
