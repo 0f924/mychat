@@ -35,6 +35,13 @@ func (this CommandManager) Exec(mychan *mychannel.MyChannel) {
 	case "logout":
 		LogoutConsoleCommand{}.Exec(mychan)
 	default:
-		fmt.Println("无法识别您输入的指令，请重新输入")
+		fmt.Println("无法识别您输入的指令，请输以下指令：")
+		fmt.Println("sendToUser --- 发送信息给用户")
+		fmt.Println("createGroup --- 创建群聊")
+		fmt.Println("joinGroup --- 加入群聊")
+		fmt.Println("sendToGroup --- 发送群聊信息")
+		fmt.Println("listGroupMembers --- 列出群聊成员")
+		fmt.Println("quitGroup --- 退出群聊")
+		fmt.Println("logout --- 退出登录")
 	}
 }
