@@ -12,6 +12,22 @@ type Command interface {
 
 // 作用：分发任务
 type CommandManager struct {
+	cmdMap map[string]Command
+}
+
+func NewCommandManager() *CommandManager {
+	cmdManager := &CommandManager{
+		cmdMap: make(map[string]Command),
+	}
+	cmdManager.cmdMap["sendtouser"] = SendToUserConsoleCommand{}
+	cmdManager.cmdMap["sendtogroup"] = SendToGroupConsoleCommand{}
+	cmdManager.cmdMap["creategroup"] = CreateGroupConsoleCommand{}
+	cmdManager.cmdMap["joingroup"] = JoinGroupConsoleCommand{}
+	cmdManager.cmdMap["listgroupmembers"] = ListGroupMembersConsoleCommand{}
+	cmdManager.cmdMap["quitgroup"] = QuitGroupConsoleCommand{}
+	cmdManager.cmdMap["logout"] = LogoutConsoleCommand{}
+
+	return cmdManager
 }
 
 func (this CommandManager) Exec(mychan *mychannel.MyChannel) {
@@ -19,22 +35,8 @@ func (this CommandManager) Exec(mychan *mychannel.MyChannel) {
 	var command string
 	fmt.Scanln(&command)
 	command = strings.ToLower(command)
-	switch command {
-	case "sendtouser":
-		SendToUserConsoleCommand{}.Exec(mychan)
-	case "sendtogroup":
-		SendToGroupConsoleCommand{}.Exec(mychan)
-	case "creategroup":
-		CreateGroupConsoleCommand{}.Exec(mychan)
-	case "joingroup":
-		JoinGroupConsoleCommand{}.Exec(mychan)
-	case "listgroupmembers":
-		ListGroupMembersConsoleCommand{}.Exec(mychan)
-	case "quitgroup":
-		QuitGroupConsoleCommand{}.Exec(mychan)
-	case "logout":
-		LogoutConsoleCommand{}.Exec(mychan)
-	default:
+
+	if _, ok := this.cmdMap[command]; !ok {
 		fmt.Println("无法识别您输入的指令，请输以下指令：")
 		fmt.Println("sendToUser --- 发送信息给用户")
 		fmt.Println("createGroup --- 创建群聊")
@@ -43,5 +45,8 @@ func (this CommandManager) Exec(mychan *mychannel.MyChannel) {
 		fmt.Println("listGroupMembers --- 列出群聊成员")
 		fmt.Println("quitGroup --- 退出群聊")
 		fmt.Println("logout --- 退出登录")
+		return
 	}
+
+	this.cmdMap[command].Exec(mychan)
 }

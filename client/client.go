@@ -56,7 +56,7 @@ func pipeline(mychan *mychannel.MyChannel) {
 // 开启用户命令行终端
 func startConsole(mychan *mychannel.MyChannel) {
 	loginCmd := console.LoginConsoleCommand{}
-	loginedCmd := console.CommandManager{}
+	loginedCmd := console.NewCommandManager()
 	for {
 		if mychan.IsExists("login") {
 			loginedCmd.Exec(mychan)
