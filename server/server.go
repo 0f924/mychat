@@ -55,7 +55,8 @@ func pipeline(mychan *mychannel.MyChannel, ctx *handler.HandlerContext) {
 // 开启数据包监听处理服务
 func startHandlePacket(mychan *mychannel.MyChannel, ctx *handler.HandlerContext) {
 	defer mychan.Close()
+	imhandler := handler.NewIMRequestHandler(ctx)
 	for {
-		handler.HandlerManager{ctx}.Exec(mychan, nil)
+		imhandler.Exec(mychan, nil)
 	}
 }

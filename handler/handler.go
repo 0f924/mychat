@@ -10,46 +10,66 @@ type Handler interface {
 	Exec(mychan *mychannel.MyChannel, data packet.Packet)
 }
 
-type HandlerManager struct {
-	Ctx *HandlerContext
+type IMRequestHandler struct {
+	ctx        *HandlerContext
+	handlerMap map[byte]Handler
 }
 
-func (this HandlerManager) Exec(mychan *mychannel.MyChannel, data packet.Packet) {
-	data = mychan.Read()
-	switch data.GetType() {
-	case packet.LOGIN_REQUEST:
-		LoginRequestHandler{this.Ctx}.Exec(mychan, data)
-	case packet.LOGIN_RESPONSE:
-		LoginResponseHandler{}.Exec(mychan, data)
-	case packet.LOGOUT_REQUEST:
-		LogoutRequestHandler{this.Ctx}.Exec(mychan, data)
-	case packet.LOGOUT_RESPONSE:
-		LogoutResponseHandler{}.Exec(mychan, data)
-	case packet.MESSAGE_REQUEST:
-		MessageRequestHandler{this.Ctx}.Exec(mychan, data)
-	case packet.MESSAGE_RESPONSE:
-		MessageResponseHandler{}.Exec(mychan, data)
-	case packet.CREATE_GROUP_REQUEST:
-		CreateGroupRequestHandler{this.Ctx}.Exec(mychan, data)
-	case packet.CREATE_GROUP_RESPONSE:
-		CreateGroupResponseHandler{}.Exec(mychan, data)
-	case packet.JOIN_GROUP_REQUEST:
-		JoinGroupRequestHandler{this.Ctx}.Exec(mychan, data)
-	case packet.JOIN_GROUP_RESPONSE:
-		JoinGroupResponseHandler{}.Exec(mychan, data)
-	case packet.LIST_GROUP_MEMBERS_REQUEST:
-		ListGroupMembersRequestHandler{this.Ctx}.Exec(mychan, data)
-	case packet.LIST_GROUP_MEMBERS_RESPONSE:
-		ListGroupMembersResponseHandler{}.Exec(mychan, data)
-	case packet.GROUP_MESSAGE_REQUEST:
-		GroupMessageRequestHandler{this.Ctx}.Exec(mychan, data)
-	case packet.GROUP_MESSAGE_RESPONSE:
-		GroupMessageResponseHandler{}.Exec(mychan, data)
-	case packet.QUIT_GROUP_REQUEST:
-		QuitGroupRequestHandler{this.Ctx}.Exec(mychan, data)
-	case packet.QUIT_GROUP_RESPONSE:
-		QuitGroupResponseHandler{}.Exec(mychan, data)
-	default:
-		fmt.Println("识别不出数据包的类型！")
+func NewIMRequestHandler(ctx *HandlerContext) *IMRequestHandler {
+	imHandler := &IMRequestHandler{
+		ctx:        ctx,
+		handlerMap: make(map[byte]Handler),
 	}
+	imHandler.handlerMap[packet.LOGIN_REQUEST] = LoginRequestHandler{ctx}
+	imHandler.handlerMap[packet.LOGOUT_REQUEST] = LogoutRequestHandler{ctx}
+	imHandler.handlerMap[packet.MESSAGE_REQUEST] = MessageRequestHandler{ctx}
+	imHandler.handlerMap[packet.CREATE_GROUP_REQUEST] = CreateGroupRequestHandler{ctx}
+	imHandler.handlerMap[packet.JOIN_GROUP_REQUEST] = JoinGroupRequestHandler{ctx}
+	imHandler.handlerMap[packet.LIST_GROUP_MEMBERS_REQUEST] = ListGroupMembersRequestHandler{ctx}
+	imHandler.handlerMap[packet.GROUP_MESSAGE_REQUEST] = GroupMessageRequestHandler{ctx}
+	imHandler.handlerMap[packet.QUIT_GROUP_REQUEST] = QuitGroupRequestHandler{ctx}
+
+	return imHandler
+}
+
+func (this IMRequestHandler) Exec(mychan *mychannel.MyChannel, data packet.Packet) {
+	data = mychan.Read()
+	packetType := data.GetType()
+
+	if _, ok := this.handlerMap[packetType]; !ok {
+		fmt.Println("识别不出数据包的类型！")
+		return
+	}
+	this.handlerMap[packetType].Exec(mychan, data)
+}
+
+type IMResponseHandler struct {
+	handlerMap map[byte]Handler
+}
+
+func NewIMResponseHandler() *IMResponseHandler {
+	imHandler := &IMResponseHandler{
+		handlerMap: make(map[byte]Handler),
+	}
+	imHandler.handlerMap[packet.LOGIN_RESPONSE] = LoginResponseHandler{}
+	imHandler.handlerMap[packet.LOGOUT_RESPONSE] = LogoutResponseHandler{}
+	imHandler.handlerMap[packet.MESSAGE_RESPONSE] = MessageResponseHandler{}
+	imHandler.handlerMap[packet.CREATE_GROUP_RESPONSE] = CreateGroupResponseHandler{}
+	imHandler.handlerMap[packet.JOIN_GROUP_RESPONSE] = JoinGroupResponseHandler{}
+	imHandler.handlerMap[packet.LIST_GROUP_MEMBERS_RESPONSE] = ListGroupMembersResponseHandler{}
+	imHandler.handlerMap[packet.GROUP_MESSAGE_RESPONSE] = GroupMessageResponseHandler{}
+	imHandler.handlerMap[packet.QUIT_GROUP_RESPONSE] = QuitGroupResponseHandler{}
+
+	return imHandler
+}
+
+func (this IMResponseHandler) Exec(mychan *mychannel.MyChannel, data packet.Packet) {
+	data = mychan.Read()
+	packetType := data.GetType()
+
+	if _, ok := this.handlerMap[packetType]; !ok {
+		fmt.Println("识别不出数据包的类型！")
+		return
+	}
+	this.handlerMap[packetType].Exec(mychan, data)
 }

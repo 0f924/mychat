@@ -69,7 +69,8 @@ func startConsole(mychan *mychannel.MyChannel) {
 // 开启数据包监听处理服务
 func startHandlePacket(mychan *mychannel.MyChannel) {
 	defer mychan.Close()
+	imhandler := handler.NewIMResponseHandler()
 	for {
-		handler.HandlerManager{}.Exec(mychan, nil)
+		imhandler.Exec(mychan, nil)
 	}
 }
