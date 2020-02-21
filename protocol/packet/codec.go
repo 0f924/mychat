@@ -134,6 +134,38 @@ func Decode(bys []byte) Packet {
 			log.Fatal("JSON解码失败！")
 		}
 		packet = crtGrpResp
+
+	case JOIN_GROUP_REQUEST:
+		joinGrpReq := JoinGroupRequestPacket{}
+		err = json.Unmarshal(data, &joinGrpReq)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = joinGrpReq
+
+	case JOIN_GROUP_RESPONSE:
+		joinGrpResp := JoinGroupResponsePacket{}
+		err = json.Unmarshal(data, &joinGrpResp)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = joinGrpResp
+
+	case LIST_GROUP_MEMBERS_REQUEST:
+		lsGrpMebReq := ListGroupMembersRequestPacket{}
+		err = json.Unmarshal(data, &lsGrpMebReq)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = lsGrpMebReq
+
+	case LIST_GROUP_MEMBERS_RESPONSE:
+		lsGrpMebResp := ListGroupMembersResponsePacket{}
+		err = json.Unmarshal(data, &lsGrpMebResp)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = lsGrpMebResp
 	}
 
 	return packet

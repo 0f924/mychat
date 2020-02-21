@@ -1,5 +1,7 @@
 package packet
 
+import "mychat/session"
+
 // 响应数据包
 
 // type: 创建群组
@@ -53,8 +55,8 @@ func (packet JoinGroupResponsePacket) GetType() byte {
 
 // type: 列出群组成员（待实现）
 type ListGroupMembersResponsePacket struct {
-	GroupId string
-	// SessionList []Session
+	GroupId  string
+	UserList []session.User
 }
 
 func (packet ListGroupMembersResponsePacket) GetType() byte {
