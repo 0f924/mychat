@@ -118,6 +118,22 @@ func Decode(bys []byte) Packet {
 			log.Fatal("JSON解码失败！")
 		}
 		packet = msgResp
+
+	case CREATE_GROUP_REQUEST:
+		crtGrpReq := CreateGroupRequestPacket{}
+		err = json.Unmarshal(data, &crtGrpReq)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = crtGrpReq
+
+	case CREATE_GROUP_RESPONSE:
+		crtGrpResp := CreateGroupResponsePacket{}
+		err = json.Unmarshal(data, &crtGrpResp)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = crtGrpResp
 	}
 
 	return packet
