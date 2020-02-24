@@ -198,6 +198,22 @@ func Decode(bys []byte) Packet {
 			log.Fatal("JSON解码失败！")
 		}
 		packet = quitGrpResp
+
+	case HEARTBEAT_REQUEST:
+		heartbeatReq := HeartBeatRequestPacket{}
+		err = json.Unmarshal(data, &heartbeatReq)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = heartbeatReq
+
+	case HEARTBEAT_RESPONSE:
+		heartbeatResp := HeartBeatResponsePacket{}
+		err = json.Unmarshal(data, &heartbeatResp)
+		if err != nil {
+			log.Fatal("JSON解码失败！")
+		}
+		packet = heartbeatResp
 	}
 
 	return packet

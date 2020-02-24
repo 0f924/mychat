@@ -4,7 +4,10 @@ import (
 	"mychat/protocol/packet"
 	"mychat/utils"
 	"net"
+	"time"
 )
+
+const IDLE_TIME int = 15
 
 type MyChannel struct {
 	conn net.Conn
@@ -16,7 +19,12 @@ func NewMyChannel(conn net.Conn) *MyChannel {
 		conn: conn,
 		attr: make(map[string]interface{}),
 	}
+	mychan.UpdateDeadline()
 	return &mychan
+}
+
+func (this *MyChannel) UpdateDeadline() {
+	this.conn.SetDeadline(time.Now().Add(time.Duration(IDLE_TIME) * time.Second))
 }
 
 func (this *MyChannel) DeleteAttr(key string) {

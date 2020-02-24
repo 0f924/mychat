@@ -28,6 +28,7 @@ func NewIMRequestHandler(ctx *HandlerContext) *IMRequestHandler {
 	imHandler.handlerMap[packet.LIST_GROUP_MEMBERS_REQUEST] = ListGroupMembersRequestHandler{ctx}
 	imHandler.handlerMap[packet.GROUP_MESSAGE_REQUEST] = GroupMessageRequestHandler{ctx}
 	imHandler.handlerMap[packet.QUIT_GROUP_REQUEST] = QuitGroupRequestHandler{ctx}
+	imHandler.handlerMap[packet.HEARTBEAT_REQUEST] = HeartBeatRequestHandler{ctx}
 
 	return imHandler
 }
@@ -39,6 +40,9 @@ func (this IMRequestHandler) Exec(mychan *mychannel.MyChannel, data packet.Packe
 	if _, ok := this.handlerMap[packetType]; !ok {
 		fmt.Println("识别不出数据包的类型！")
 		return
+	}
+	if packetType != packet.HEARTBEAT_REQUEST {
+		this.handlerMap[packet.HEARTBEAT_REQUEST].Exec(mychan, data)
 	}
 	this.handlerMap[packetType].Exec(mychan, data)
 }
@@ -59,6 +63,7 @@ func NewIMResponseHandler() *IMResponseHandler {
 	imHandler.handlerMap[packet.LIST_GROUP_MEMBERS_RESPONSE] = ListGroupMembersResponseHandler{}
 	imHandler.handlerMap[packet.GROUP_MESSAGE_RESPONSE] = GroupMessageResponseHandler{}
 	imHandler.handlerMap[packet.QUIT_GROUP_RESPONSE] = QuitGroupResponseHandler{}
+	imHandler.handlerMap[packet.HEARTBEAT_RESPONSE] = HeartBeatResponseHandler{}
 
 	return imHandler
 }
@@ -70,6 +75,10 @@ func (this IMResponseHandler) Exec(mychan *mychannel.MyChannel, data packet.Pack
 	if _, ok := this.handlerMap[packetType]; !ok {
 		fmt.Println("识别不出数据包的类型！")
 		return
+	}
+
+	if packetType != packet.HEARTBEAT_RESPONSE {
+		this.handlerMap[packet.HEARTBEAT_RESPONSE].Exec(mychan, data)
 	}
 	this.handlerMap[packetType].Exec(mychan, data)
 }

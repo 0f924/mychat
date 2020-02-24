@@ -5,6 +5,7 @@ import (
 	"mychat/client/console"
 	"mychat/handler"
 	"mychat/mychannel"
+	"mychat/protocol/packet"
 	"mychat/utils"
 	"net"
 	"strconv"
@@ -50,6 +51,8 @@ func connect(host, port string, retry int) net.Conn {
 // 客户端工作流水线
 func pipeline(mychan *mychannel.MyChannel) {
 	go startHandlePacket(mychan)
+	// 每 5 s发送一次心跳包
+	go startHeartBeat(mychan, 5)
 	startConsole(mychan)
 }
 
@@ -72,5 +75,14 @@ func startHandlePacket(mychan *mychannel.MyChannel) {
 	imhandler := handler.NewIMResponseHandler()
 	for {
 		imhandler.Exec(mychan, nil)
+	}
+}
+
+// 开启心跳
+func startHeartBeat(mychan *mychannel.MyChannel, idle int) {
+	heartbeat := packet.HeartBeatRequestPacket{}
+	for {
+		mychan.Write(heartbeat)
+		time.Sleep(time.Duration(idle) * time.Second)
 	}
 }
